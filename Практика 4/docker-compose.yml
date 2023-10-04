@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  apache:
+    container_name: apache
+    build: ./apache
+    volumes:
+      - ./apache/api:/var/www/html
+    depends_on:
+      - database
+      - nginx
+
+  nginx:
+    image: nginx
+    container_name: nginx
+    volumes:
+      - ./nginx/data:/etc/nginx/contacts
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/app.conf
+    ports:
+      - "8080:80"
+    depends_on:
+      - database
+
+  database:
+    image: mysql
+    container_name: db
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      LANG: C.UTF_8
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d:ro
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
